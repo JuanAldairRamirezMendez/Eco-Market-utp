@@ -14,22 +14,22 @@
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
         <!-- Username or Email -->
         <div>
-          <label for="usernameOrEmail" class="block text-sm font-medium text-gray-700">
+          <label for="username" class="block text-sm font-medium text-gray-700">
             Usuario o Correo electrónico
           </label>
           <div class="mt-1">
             <input
-              id="usernameOrEmail"
-              name="usernameOrEmail"
+              id="username"
+              name="username"
               type="text"
-              autocomplete="username email"
-              formControlName="usernameOrEmail"
+              autocomplete="username"
+              formControlName="username"
               class="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm transition-colors"
-              [class.border-red-300]="f['usernameOrEmail'].invalid && f['usernameOrEmail'].touched"
+              [class.border-red-300]="f['username'].invalid && f['username'].touched"
               placeholder="usuario o tu@email.com"
             />
-            <div *ngIf="f['usernameOrEmail'].invalid && f['usernameOrEmail'].touched" class="mt-1">
-              <p *ngIf="f['usernameOrEmail'].errors?.['required']" class="text-sm text-red-600">
+            <div *ngIf="f['username'].invalid && f['username'].touched" class="mt-1">
+              <p *ngIf="f['username'].errors?.['required']" class="text-sm text-red-600">
                 El usuario o correo es requerido
               </p>
             </div>

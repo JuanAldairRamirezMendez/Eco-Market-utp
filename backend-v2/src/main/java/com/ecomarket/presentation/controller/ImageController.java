@@ -4,10 +4,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -22,8 +24,24 @@ public class ImageController {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
+    @Value("${aws.s3.enabled:false}")
+    private boolean s3Enabled;
+
+    @Value("${aws.s3.bucket-name:}")
+    private String bucketName;
+
     @GetMapping("/{filename:.+}")
-    public ResponseEntity<Resource> getImage(@PathVariable String filename) {
+    public ResponseEntity<?> getImage(@PathVariable String filename) {
+        // Si S3 está habilitado, redireccionar a S3
+        if (s3Enabled && !bucketName.isEmpty()) {
+            String s3Url = String.format("https://%s.s3.us-east-1.amazonaws.com/products/%s", 
+                                       bucketName, filename);
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(s3Url))
+                    .build();
+        }
+
+        // Si S3 no está habilitado, servir desde local
         try {
             Path filePath = Paths.get(uploadDir).resolve(filename).normalize();
             Resource resource = new UrlResource(filePath.toUri());

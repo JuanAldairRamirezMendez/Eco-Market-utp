@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { CartService } from '../../../services/cart.service';
 import { AuthService } from '../../../services/auth.service';
 import { Subscription } from 'rxjs';
@@ -15,12 +15,14 @@ import { Subscription } from 'rxjs';
 export class NavbarComponent implements OnInit, OnDestroy {
   cartItemCount: number = 0;
   isAuthenticated = false;
+  isAdmin = false;
   currentUser: any = null;
   private subscriptions: Subscription[] = [];
 
   constructor(
     private cartService: CartService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -34,6 +36,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.authService.currentUser$.subscribe((user: any) => {
         this.currentUser = user;
         this.isAuthenticated = !!user;
+        this.isAdmin = this.authService.isAdmin();
       })
     );
   }
@@ -44,5 +47,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.authService.logout();
+    this.router.navigate(['/']);
   }
 }

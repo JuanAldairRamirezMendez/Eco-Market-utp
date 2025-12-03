@@ -1,0 +1,22 @@
+# Archivos con credenciales sensibles
+ecomarket-key.pem
+*.pem
+CONFIGURACION_S3_COMPLETADA.md
+CREDENCIALES_Y_ACCESO.md
+load-aws-config.ps1
+
+# Archivos de configuración local con secretos
+.env
+.env.local
+.env.*.local
+
+# Archivos target de Maven
+backend-v2/target/
+backend-v2/uploads/
+uploads/
+
+# AWS credentials
+.aws/
+
+# Logs
+*.log

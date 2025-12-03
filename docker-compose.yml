@@ -12,7 +12,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./database_schema.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - ecomarket-network
     healthcheck:
@@ -29,18 +28,16 @@ services:
       dockerfile: Dockerfile
     container_name: ecomarket-backend
     environment:
-      # Database
+      # Database: PostgreSQL (usando nombre del servicio Docker)
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ecomarket_db
       SPRING_DATASOURCE_USERNAME: ecomarket_user
       SPRING_DATASOURCE_PASSWORD: ecomarket_pass123
-      
-      # JPA/Hibernate
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: "false"
-      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       
-      # JWT
-      JWT_SECRET: ${JWT_SECRET:-ecomarket-super-secret-key-2024-production-change-this-in-aws}
+      # JWT - Clave de 64+ caracteres para HS512
+      JWT_SECRET: ${JWT_SECRET:-09QK6DHuATCn383txu1Z1B6ybjkpuA163FjgWTdu4emOixDQgTqJXS20XoYofFaEyP1Uak3p1BqXzc24kgmQ==}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
       
       # File Upload
@@ -52,13 +49,14 @@ services:
       
       # Server
       SERVER_PORT: 8080
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: dev
       
-      # AWS S3 (opcional - para producción)
-      AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME:-}
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
-      AWS_REGION: ${AWS_REGION:-us-east-1}
+      # AWS S3
+      AWS_S3_ENABLED: "true"
+      AWS_S3_BUCKET_NAME: "ecomarket-images-prod"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+      AWS_REGION: "us-east-1"
     ports:
       - "8080:8080"
     volumes:
@@ -69,11 +67,11 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/ecomarket/api/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/ecomarket/api/health"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 60s
+    #   retries: 5
+    #   start_period: 60s
     restart: unless-stopped
 
   # Frontend Angular con Nginx
@@ -83,16 +81,16 @@ services:
       dockerfile: Dockerfile
     container_name: ecomarket-frontend
     ports:
-      - "80:80"
+      - "3000:80"
     networks:
       - ecomarket-network
     depends_on:
       - backend
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+    # healthcheck:
+    #   test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+    #   interval: 30s
+    #   timeout: 5s
+    #   retries: 3
     restart: unless-stopped
 
 networks:

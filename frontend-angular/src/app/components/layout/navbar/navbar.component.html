@@ -28,8 +28,12 @@
 
         <!-- Authenticated User -->
         <div *ngIf="isAuthenticated" class="flex items-center space-x-4">
-          <a routerLink="/dashboard" class="text-gray-700 hover:text-green-600 transition-colors">
-            {{ currentUser?.username }}
+          <!-- Admin Panel Link (solo visible para administradores) -->
+          <a *ngIf="isAdmin" routerLink="/admin/dashboard" class="text-gray-700 hover:text-green-600 transition-colors font-medium">
+            ⚙️ Panel Admin
+          </a>
+          <a routerLink="/dashboard" class="text-gray-700 hover:text-green-600 transition-colors font-medium">
+            👤 {{ currentUser?.firstName || currentUser?.username }}
           </a>
           <button (click)="logout()" class="text-gray-700 hover:text-red-600 transition-colors">
             Cerrar sesión

@@ -21,6 +21,7 @@ com\ecomarket\application\dto\response\RoleResponse.class
 com\ecomarket\domain\model\Role$RoleBuilder.class
 com\ecomarket\application\dto\response\AuthResponse$AuthResponseBuilder.class
 com\ecomarket\application\dto\response\UserResponse.class
+com\ecomarket\presentation\controller\FileUploadController.class
 com\ecomarket\domain\repository\ProductRepository.class
 com\ecomarket\application\dto\response\ProductResponse$ProductResponseBuilder.class
 com\ecomarket\application\mapper\RoleMapperImpl.class
@@ -86,6 +87,7 @@ com\ecomarket\application\dto\response\ProductResponse.class
 com\ecomarket\presentation\exception\GlobalExceptionHandler.class
 com\ecomarket\application\dto\response\OrderItemResponse$OrderItemResponseBuilder.class
 com\ecomarket\domain\model\User$UserBuilder.class
+com\ecomarket\presentation\controller\DatabaseController.class
 com\ecomarket\infrastructure\config\WebSocketConfig$1.class
 com\ecomarket\presentation\websocket\WebSocketNotificationService$1.class
 com\ecomarket\presentation\controller\ImageController.class

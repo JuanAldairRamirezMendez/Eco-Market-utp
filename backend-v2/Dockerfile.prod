@@ -1,0 +1,29 @@
+# Dockerfile para producción con configuración AWS
+
+FROM openjdk:17-jdk-slim
+
+# Instalar wget para health checks
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+
+# Crear directorio de aplicación
+WORKDIR /app
+
+# Copiar JAR
+COPY target/backend-v2-1.0.0.jar app.jar
+
+# Copiar configuración de producción
+COPY aws-deployment/application-production.properties application-production.properties
+
+# Variables de ambiente por defecto
+ENV SPRING_PROFILES_ACTIVE=production
+ENV JAVA_OPTS="-Xmx512m -Xms256m"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/ecomarket/api/health || exit 1
+
+# Puerto
+EXPOSE 8080
+
+# Comando de inicio
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar --spring.config.additional-location=classpath:/application-production.properties"]

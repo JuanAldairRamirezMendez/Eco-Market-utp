@@ -116,9 +116,11 @@ export class AdminProductFormComponent implements OnInit, OnDestroy {
     // Populate tags
     const tagsFormArray = this.productForm.get('tags') as FormArray;
     tagsFormArray.clear();
-    product.tags.forEach(tag => {
-      tagsFormArray.push(this.fb.control(tag));
-    });
+    if (product.tags && Array.isArray(product.tags)) {
+      product.tags.forEach(tag => {
+        tagsFormArray.push(this.fb.control(tag));
+      });
+    }
 
     // Set image preview
     this.imagePreview = product.imageUrl;

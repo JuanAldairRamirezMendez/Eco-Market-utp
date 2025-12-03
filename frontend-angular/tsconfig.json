@@ -18,7 +18,7 @@
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
-    "baseUrl": "./",
+    "baseUrl": "./",//
     "paths": {
       "@app/*": ["src/app/*"],
       "@env/*": ["src/environments/*"]

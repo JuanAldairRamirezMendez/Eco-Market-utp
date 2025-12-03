@@ -32,10 +32,12 @@ C:\Users\DARIO\EcoMarket-springboot\backend-v2\src\main\java\com\ecomarket\appli
 C:\Users\DARIO\EcoMarket-springboot\backend-v2\src\main\java\com\ecomarket\application\dto\response\OrderResponse.java
 C:\Users\DARIO\EcoMarket-springboot\backend-v2\src\main\java\com\ecomarket\application\mapper\ProductMapper.java
 C:\Users\DARIO\EcoMarket-springboot\backend-v2\src\main\java\com\ecomarket\infrastructure\security\CustomUserDetailsService.java
+C:\Users\DARIO\EcoMarket-springboot\backend-v2\src\main\java\com\ecomarket\presentation\controller\FileUploadController.java
 C:\Users\DARIO\EcoMarket-springboot\backend-v2\src\main\java\com\ecomarket\infrastructure\persistence\repository\JpaProductRepository.java
 C:\Users\DARIO\EcoMarket-springboot\backend-v2\src\main\java\com\ecomarket\infrastructure\config\DataSeeder.java
 C:\Users\DARIO\EcoMarket-springboot\backend-v2\src\main\java\com\ecomarket\application\dto\response\ProductResponse.java
 C:\Users\DARIO\EcoMarket-springboot\backend-v2\src\main\java\com\ecomarket\infrastructure\persistence\mapper\RoleEntityMapper.java
+C:\Users\DARIO\EcoMarket-springboot\backend-v2\src\main\java\com\ecomarket\presentation\controller\DatabaseController.java
 C:\Users\DARIO\EcoMarket-springboot\backend-v2\src\main\java\com\ecomarket\application\mapper\OrderMapper.java
 C:\Users\DARIO\EcoMarket-springboot\backend-v2\src\main\java\com\ecomarket\domain\model\Category.java
 C:\Users\DARIO\EcoMarket-springboot\backend-v2\src\main\java\com\ecomarket\application\mapper\OrderItemMapper.java

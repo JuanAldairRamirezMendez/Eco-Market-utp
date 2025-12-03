@@ -1,0 +1,45 @@
+# Multi-stage build para reducir tamaño de imagen (importante para Free Tier ECR)
+
+# Stage 1: Build
+FROM openjdk:17-jdk-slim as build
+
+WORKDIR /app
+
+# Copiar archivos de configuración
+COPY pom.xml .
+COPY src ./src/
+
+# Construir aplicación (sin tests para reducir tiempo)
+RUN apt-get update && apt-get install -y maven && \
+    mvn clean package -DskipTests && \
+    rm -rf /var/lib/apt/lists/*
+
+# Stage 2: Runtime (imagen más pequeña)
+FROM openjdk:17-jre-slim
+
+# Instalar solo wget para health checks
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+
+# Crear usuario no-root por seguridad
+RUN addgroup --system spring && adduser --system spring --ingroup spring
+USER spring:spring
+
+# Directorio de trabajo
+WORKDIR /app
+
+# Copiar JAR desde stage de build
+COPY --from=build --chown=spring:spring /app/target/backend-v2-1.0.0.jar app.jar
+
+# Variables de ambiente optimizadas para Free Tier
+ENV SPRING_PROFILES_ACTIVE=production
+ENV JAVA_OPTS="-Xmx400m -Xms128m -XX:MaxMetaspaceSize=64m -XX:+UseG1GC"
+
+# Health check optimizado
+HEALTHCHECK --interval=60s --timeout=10s --start-period=120s --retries=2 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/ecomarket/api/health || exit 1
+
+# Puerto
+EXPOSE 8080
+
+# Comando optimizado para contenedor pequeño
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

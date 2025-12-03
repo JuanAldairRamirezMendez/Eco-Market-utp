@@ -132,8 +132,15 @@ export class ProductsService {
       isOrganic: response.isOrganic,
       certifications: response.certifications,
       originCountry: response.originCountry,
+      carbonFootprint: response.carbonFootprint ?? undefined,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      // Aliases para compatibilidad
+      category: response.categoryName,
+      inStock: response.stockQuantity > 0,
+      tags: [], // Inicializar tags como array vacío
+      ecoRating: 3, // Valor por defecto
+      sustainabilityScore: 80 // Valor por defecto
     };
   }
 

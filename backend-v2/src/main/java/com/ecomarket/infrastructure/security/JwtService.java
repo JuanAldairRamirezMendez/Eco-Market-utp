@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 /**
@@ -21,8 +20,8 @@ import java.util.Date;
 @Slf4j
 public class JwtService {
     
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+    // Generar clave segura automáticamente para HS512
+    private final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
     
     @Value("${jwt.expiration-ms}")
     private long jwtExpirationMs;
@@ -42,13 +41,11 @@ public class JwtService {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
         
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-        
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(key, SignatureAlgorithm.HS512) // JWS con HS512
+                .signWith(key, SignatureAlgorithm.HS512) // JWS con HS512 usando clave generada
                 .compact();
     }
     
@@ -56,8 +53,6 @@ public class JwtService {
      * Extrae el username del token JWT
      */
     public String getUsernameFromToken(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-        
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
@@ -72,8 +67,6 @@ public class JwtService {
      */
     public boolean validateToken(String authToken) {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-            
             Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()

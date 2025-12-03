@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 
 export interface AuthRequest {
-  usernameOrEmail: string;
+  username: string;
   password: string;
 }
 
@@ -16,9 +16,15 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   token: string;
-  id: number;
-  username: string;
-  email: string;
+  type?: string;
+  user: {
+    id: number;
+    username: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    roles?: Array<{ id: number; name: string }>;
+  };
 }
 
 export interface User {
@@ -34,7 +40,7 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:8090/ecomarket/api';
+  private readonly API_URL = 'http://localhost:8080/ecomarket/api';
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'auth_user';
 
@@ -56,11 +62,14 @@ export class AuthService {
         tap((response: AuthResponse) => {
           if (isPlatformBrowser(this.platformId)) {
             localStorage.setItem(this.TOKEN_KEY, response.token);
+            const roles = response.user.roles?.map(r => r.name) || [];
             const user: User = {
-              id: response.id,
-              username: response.username,
-              email: response.email,
-              roles: [] // Will be decoded from JWT if needed
+              id: response.user.id,
+              username: response.user.username,
+              email: response.user.email,
+              firstName: response.user.firstName,
+              lastName: response.user.lastName,
+              roles: roles
             };
             localStorage.setItem(this.USER_KEY, JSON.stringify(user));
             this.currentUserSubject.next(user);
@@ -75,11 +84,14 @@ export class AuthService {
         tap((response: AuthResponse) => {
           if (isPlatformBrowser(this.platformId)) {
             localStorage.setItem(this.TOKEN_KEY, response.token);
+            const roles = response.user.roles?.map(r => r.name) || [];
             const user: User = {
-              id: response.id,
-              username: response.username,
-              email: response.email,
-              roles: []
+              id: response.user.id,
+              username: response.user.username,
+              email: response.user.email,
+              firstName: response.user.firstName,
+              lastName: response.user.lastName,
+              roles: roles
             };
             localStorage.setItem(this.USER_KEY, JSON.stringify(user));
             this.currentUserSubject.next(user);

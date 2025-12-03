@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService, AuthRequest } from '../../../services/auth.service';
 
@@ -11,20 +11,27 @@ import { AuthService, AuthRequest } from '../../../services/auth.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   loading = false;
   error = '';
+  returnUrl: string = '/';
 
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.loginForm = this.formBuilder.group({
-      usernameOrEmail: ['', [Validators.required]],
-      password: ['', [Validators.required]]
+      username: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
+  }
+
+  ngOnInit(): void {
+    // Obtener la URL a la que el usuario intentaba acceder
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
   get f() { return this.loginForm.controls; }
@@ -42,7 +49,8 @@ export class LoginComponent {
     this.authService.login(credentials).subscribe({
       next: (response: any) => {
         this.loading = false;
-        this.router.navigate(['/']);
+        // Redirigir a la URL original o al home
+        this.router.navigateByUrl(this.returnUrl);
       },
       error: (error: any) => {
         this.loading = false;

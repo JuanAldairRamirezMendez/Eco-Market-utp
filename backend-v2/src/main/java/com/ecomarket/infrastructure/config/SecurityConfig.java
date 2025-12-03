@@ -45,8 +45,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/health").permitAll()  // Endpoint de health check
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/upload/**").permitAll()  // Permitir subir imágenes
+                        .requestMatchers("/database/**").permitAll()  // Permitir operaciones de base de datos
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
