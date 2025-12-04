@@ -28,7 +28,13 @@ interface ProductResponse {
   providedIn: 'root'
 })
 export class ProductsService {
-  private readonly API_URL = `${environment.apiUrl.replace(/\/+$/, '')}/products`;
+  // Use runtime config `window.__env.apiUrl` if provided (deployed frontend on Render),
+  // otherwise fall back to build-time environment.apiUrl
+  private get API_URL(): string {
+    const runtimeApi = (window as any).__env?.apiUrl as string | undefined;
+    const base = runtimeApi && runtimeApi.length > 0 ? runtimeApi : environment.apiUrl;
+    return `${base.replace(/\/+$/, '')}/products`;
+  }
   private products: Product[] = [];
   private productsSubject = new BehaviorSubject<Product[]>(this.products);
   public products$ = this.productsSubject.asObservable();
@@ -115,8 +121,9 @@ export class ProductsService {
       'default': 'https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?w=400&h=300&fit=crop'
     };
 
+    const apiBaseForImages = ((window as any).__env?.apiUrl as string | undefined) || environment.apiUrl;
     const imageUrl = response.imageFilename
-      ? `${environment.apiUrl.replace(/\/+$/, '')}/images/${response.imageFilename}`
+      ? `${apiBaseForImages.replace(/\/+$/, '')}/images/${response.imageFilename}`
       : (placeholders[response.categoryName] || placeholders['default']);
 
     return {

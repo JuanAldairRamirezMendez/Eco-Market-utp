@@ -2,6 +2,7 @@ package com.ecomarket.infrastructure.config;
 
 import com.ecomarket.infrastructure.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -36,6 +37,8 @@ public class SecurityConfig {
     
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Value("${ALLOWED_ORIGINS:}")
+    private String allowedOriginsEnv; // comma-separated list of allowed origins from environment
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -82,13 +85,21 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Orígenes permitidos - agregar el dominio de AWS cuando despliegues
-        configuration.setAllowedOrigins(List.of(
-            "http://localhost:4200", 
-            "http://localhost:3000",
-            "https://your-frontend-domain.com",  // Reemplazar con tu dominio de AWS/Vercel
-            "https://*.vercel.app"  // Si usas Vercel para el frontend
-        ));
+        // Orígenes permitidos - por defecto localhost, pero pueden sobreescribirse con ALLOWED_ORIGINS
+        if (allowedOriginsEnv != null && !allowedOriginsEnv.isBlank()) {
+            // Parse comma-separated env var
+            String[] parts = allowedOriginsEnv.split(",");
+            List<String> origins = Arrays.stream(parts)
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .toList();
+            configuration.setAllowedOrigins(origins);
+        } else {
+            configuration.setAllowedOrigins(List.of(
+                    "http://localhost:4200",
+                    "http://localhost:3000"
+            ));
+        }
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

@@ -10,14 +10,14 @@ RUN npm ci --legacy-peer-deps || npm install
 RUN npm run build -- --configuration production || npm run build
 
 ### 2) Build del backend (Maven + JDK)
-FROM maven:3.8.8-eclipse-temurin-17 AS backend-build
+FROM maven:3.9.6-eclipse-temurin-22 AS backend-build
 WORKDIR /backend
 COPY backend-v2/ ./
 RUN mvn -B -DskipTests package
 
 ### 3) Imagen final: Java (Temurin) + Nginx
 # Usamos Eclipse Temurin para mayor compatibilidad con mirrors
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:22-jdk
 
 # Instala nginx
 RUN apt-get update \
@@ -32,6 +32,11 @@ COPY --from=backend-build /backend/target/*.jar /app/app.jar
 # Copia los assets build del frontend al directorio de nginx (copiando el contenido)
 RUN mkdir -p /var/www/html
 COPY --from=frontend-build /frontend/dist/. /var/www/html/
+
+# Insert runtime env script loader into index.html if present
+RUN if [ -f /var/www/html/index.html ]; then \
+      sed -i "s#</head>#  <script src=\"/env.js\"></script>\n</head>#" /var/www/html/index.html || true; \
+    fi
 
 # Copia la configuración de nginx (servir SPA y proxy /api/ al backend local)
 COPY docker/nginx-default.conf /etc/nginx/conf.d/default.conf
