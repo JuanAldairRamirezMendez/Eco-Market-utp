@@ -42,6 +42,10 @@ RUN if [ -f /var/www/html/index.html ]; then \
       sed -i "s#</head>#  <script src=\"/env.js\"></script>\n</head>#" /var/www/html/frontend-angular/index.html || true; \
     fi
 
+  # DEBUG: listar contenido copiado para verificar rutas (temporal)
+  RUN echo "--- DEBUG: /var/www/html ---" && ls -la /var/www/html || true
+  RUN echo "--- DEBUG: /var/www/html/frontend-angular ---" && ls -la /var/www/html/frontend-angular || true
+
 # Copia la configuración de nginx (servir SPA y proxy /api/ al backend local)
 COPY docker/nginx-default.conf /etc/nginx/conf.d/default.conf
 
