@@ -15,8 +15,9 @@ WORKDIR /backend
 COPY backend-v2/ ./
 RUN mvn -B -DskipTests package
 
-### 3) Imagen final: OpenJDK + Nginx
-FROM openjdk:17-jdk-slim
+### 3) Imagen final: Java (Temurin) + Nginx
+# Usamos Eclipse Temurin para mayor compatibilidad con mirrors
+FROM eclipse-temurin:17-jdk
 
 # Instala nginx
 RUN apt-get update \
