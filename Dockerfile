@@ -32,41 +32,11 @@ COPY --from=backend-build /backend/target/*.jar /app/app.jar
 RUN mkdir -p /var/www/html
 COPY --from=frontend-build /frontend/dist/. /var/www/html/
 
-# Configuración simple de nginx: servir SPA y hacer proxy de /api/ al backend local
-RUN bash -c 'cat > /etc/nginx/conf.d/default.conf <<EOF
-server {
-    listen 80;
-    server_name _;
-    root /var/www/html;
-    index index.html;
+# Copia la configuración de nginx (servir SPA y proxy /api/ al backend local)
+COPY docker/nginx-default.conf /etc/nginx/conf.d/default.conf
 
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    location /api/ {
-        proxy_pass http://127.0.0.1:8080/;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-EOF'
-
-# Script de inicio: arranca el backend en background y nginx en foreground
-RUN bash -c 'cat > /start.sh <<"'"'EOF
-#!/bin/bash
-set -e
-
-# Arranca el backend en puerto 8080
-java -Xms256m -Xmx512m -jar /app/app.jar &
-
-# Arranca nginx en primer plano
-nginx -g "daemon off;"
-EOF'"'"'
-
+# Copia el script de inicio
+COPY docker/start.sh /start.sh
 RUN chmod +x /start.sh
 
 EXPOSE 80 8080
