@@ -31,11 +31,15 @@ COPY --from=backend-build /backend/target/*.jar /app/app.jar
 
 # Copia los assets build del frontend al directorio de nginx (copiando el contenido)
 RUN mkdir -p /var/www/html
-COPY --from=frontend-build /frontend/dist/. /var/www/html/
+# Angular genera la salida en /frontend/dist/<project-name> (ej: frontend-angular)
+# Copiamos esa carpeta si existe; si la estructura cambia, ajustar aquí.
+COPY --from=frontend-build /frontend/dist/frontend-angular/ /var/www/html/
 
 # Insert runtime env script loader into index.html if present
 RUN if [ -f /var/www/html/index.html ]; then \
       sed -i "s#</head>#  <script src=\"/env.js\"></script>\n</head>#" /var/www/html/index.html || true; \
+    else if [ -f /var/www/html/frontend-angular/index.html ]; then \
+      sed -i "s#</head>#  <script src=\"/env.js\"></script>\n</head>#" /var/www/html/frontend-angular/index.html || true; \
     fi
 
 # Copia la configuración de nginx (servir SPA y proxy /api/ al backend local)
