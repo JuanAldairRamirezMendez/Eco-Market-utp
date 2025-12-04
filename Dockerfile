@@ -38,7 +38,7 @@ COPY --from=frontend-build /frontend/dist/frontend-angular/ /var/www/html/
 # Insert runtime env script loader into index.html if present
 RUN if [ -f /var/www/html/index.html ]; then \
       sed -i "s#</head>#  <script src=\"/env.js\"></script>\n</head>#" /var/www/html/index.html || true; \
-    else if [ -f /var/www/html/frontend-angular/index.html ]; then \
+    elif [ -f /var/www/html/frontend-angular/index.html ]; then \
       sed -i "s#</head>#  <script src=\"/env.js\"></script>\n</head>#" /var/www/html/frontend-angular/index.html || true; \
     fi
 
